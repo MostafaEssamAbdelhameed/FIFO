@@ -1,0 +1,69 @@
+`timescale 1ns / 1ps
+
+module FIFO_WR_tb ();
+
+/////////////////////////////////////////////////////
+//////////////////clk_generator//////////////////////
+/////////////////////////////////////////////////////
+
+parameter clk_period= 20; 
+reg w_clk_tb=0; 
+always #(clk_period/2) w_clk_tb = ~w_clk_tb;
+
+/////////////////////////////////////////////////////
+///////////////Decleration & Instances///////////////
+/////////////////////////////////////////////////////
+
+reg	        	w_inc_tb;
+reg	        	w_rst_tb;
+reg     [3:0]	r_ptr_tb; 
+wire	[2:0]	w_addr_tb; 
+wire	[3:0]	w_ptr_tb; 
+wire			w_full_tb;
+
+ FIFO_WR DUT (
+		.w_inc(w_inc_tb),
+		.w_rst(w_rst_tb),
+		.w_clk(w_clk_tb),
+		.gray_r_ptr(r_ptr_tb),
+		.w_addr(w_addr_tb),
+		.gray_w_ptr(w_ptr_tb),
+		.w_full(w_full_tb)
+		);
+
+
+/////////////////////////////////////////////////////
+///////////////////Initial Block/////////////////////
+/////////////////////////////////////////////////////
+integer i;
+
+initial begin 
+	$dumpfile("FIFO_WR.vcd"); 
+	$dumpvars; 
+	
+	reset();
+    r_ptr_tb = 0;
+    #(clk_period); 
+	
+	w_inc_tb = 1;
+	#(13*clk_period);
+	w_inc_tb = 0;
+	
+	 r_ptr_tb = 4'b0111;
+	 
+end 
+
+/////////////////////////////////////////////////////
+//////////////////////Tasks//////////////////////////
+/////////////////////////////////////////////////////
+
+task reset;
+ begin
+ w_rst_tb=1;
+ #(clk_period)
+ w_rst_tb=0;
+ #(clk_period)
+ w_rst_tb=1;
+ end
+endtask
+endmodule
